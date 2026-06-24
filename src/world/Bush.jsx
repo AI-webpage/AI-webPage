@@ -10,6 +10,11 @@ import { seededRandom, randRange } from '../utils/seededRandom'
  * 길·광장 가장자리와 집 주변, 섬 빈 곳을 채운다.
  */
 const HALF = ISLAND.size / 2
+const HALL = { halfW: 5.35, front: 0.05, back: -6.6 }
+
+function isNearHall(x, z) {
+  return x > -HALL.halfW && x < HALL.halfW && z > HALL.back && z < HALL.front
+}
 
 function buildBushes() {
   const rnd = seededRandom(778899)
@@ -33,18 +38,18 @@ function buildBushes() {
   }
 
   // 집 주변
-  for (let i = 0; i < 6; i++) {
-    const a = randRange(rnd, 0, Math.PI * 2)
-    const r = randRange(rnd, 2.6, 3.6)
-    push(Math.cos(a) * r, -4 + Math.sin(a) * r, randRange(rnd, 0.7, 1.1))
-  }
+  ;[-1, 1].forEach((side) => {
+    for (let i = 0; i < 3; i++) {
+      push(side * randRange(rnd, 5.45, 6.25), randRange(rnd, -5.8, -3.0), randRange(rnd, 0.7, 1.05))
+    }
+  })
 
   // 섬 가장자리 군데군데
   for (let i = 0; i < 14; i++) {
     const x = randRange(rnd, -HALF + 1, HALF - 1)
     const z = randRange(rnd, -HALF + 1, HALF - 1)
     if (Math.abs(x) < 2 && z > 0) continue // 길 위는 피함
-    if (Math.hypot(x - 0, z - -4) < 2.6) continue // 집 위는 피함
+    if (isNearHall(x, z)) continue // 북악관 주변 회피
     push(x, z, randRange(rnd, 0.7, 1.3))
   }
 

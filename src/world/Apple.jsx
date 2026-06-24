@@ -7,6 +7,11 @@ import { ISLAND } from './constants'
  */
 const HALF = ISLAND.size / 2
 const RED = '#D7503A'
+const HALL = { halfW: 5.35, front: 0.05, back: -6.6 }
+
+function isNearHall(x, z) {
+  return x > -HALL.halfW && x < HALL.halfW && z > HALL.back && z < HALL.front
+}
 
 export default function Apple() {
   const apples = useMemo(() => {
@@ -16,7 +21,7 @@ export default function Apple() {
     while (arr.length < 7 && g++ < 200) {
       const x = randRange(rnd, -HALF + 2, HALF - 2)
       const z = randRange(rnd, -HALF + 2, HALF - 2)
-      if (Math.hypot(x, z + 4) < 3.5) continue // 집 회피
+      if (isNearHall(x, z)) continue // 북악관 주변 회피
       if (Math.abs(x) < 1.6 && z > 0) continue // 길 회피
       arr.push({ pos: [x, 0.22, z], s: randRange(rnd, 0.85, 1.15) })
     }

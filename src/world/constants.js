@@ -5,8 +5,8 @@ export const PALETTE = {
   bg: '#2A1E0E', // 배경(브라운 비네트)
   terraceTop: '#C9A26B', // 테라스 윗면
   terraceSide: '#9B7950', // 테라스 옆면
-  grass: '#9FB85E', // 잔디
-  grassShade: '#7E9B4E', // 잔디 음영
+  grass: '#727272', // 잔디
+  grassShade: '#4a4c4d', // 잔디 음영
   leaf: '#6E8B3D', // 잎
   leafDark: '#4A5E22', // 잎 진한
   trunk: '#8A6A45', // 줄기/흙
@@ -27,13 +27,13 @@ export const PALETTE = {
 // 아이소메트릭 OrthographicCamera 기본값
 export const CAMERA = {
   position: [14, 13, 14],
-  zoom: 48,
+  zoom: 30,
   near: 0.1,
-  far: 100,
+  far: 150,
 }
 
 // 섬: 한 변 20유닛, 잔디 윗면 y = 0
 export const ISLAND = {
-  size: 20,
+  size: 30,
   topY: 0,
 }

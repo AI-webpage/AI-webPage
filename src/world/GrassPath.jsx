@@ -9,16 +9,19 @@ import { PALETTE, ISLAND } from './constants'
  */
 const S = ISLAND.size
 const half = S / 2
+const PATH_CENTER_Z = half * 0.5 - 0.08
+const PATH_DARK_LENGTH = half - 0.45
+const PATH_LENGTH = half - 1.05
 
 export default function GrassPath() {
   return (
     <group>
       {/* 길 외곽(진한 테두리) */}
       <RoundedBox
-        args={[3.1, 0.22, half + 1]}
+        args={[3.1, 0.22, PATH_DARK_LENGTH]}
         radius={0.4}
         smoothness={4}
-        position={[0, 0.07, half * 0.5 - 0.6]}
+        position={[0, 0.07, PATH_CENTER_Z]}
         receiveShadow
       >
         <meshStandardMaterial color={PALETTE.pathDark} roughness={1} />
@@ -26,10 +29,10 @@ export default function GrassPath() {
 
       {/* 길 */}
       <RoundedBox
-        args={[2.5, 0.3, half]}
+        args={[2.5, 0.3, PATH_LENGTH]}
         radius={0.35}
         smoothness={4}
-        position={[0, 0.12, half * 0.5 - 0.6]}
+        position={[0, 0.12, PATH_CENTER_Z]}
         receiveShadow
         castShadow
       >
@@ -37,16 +40,6 @@ export default function GrassPath() {
       </RoundedBox>
 
       {/* 중앙 광장 */}
-      <RoundedBox
-        args={[6.4, 0.3, 6.4]}
-        radius={0.7}
-        smoothness={4}
-        position={[0, 0.12, -1.4]}
-        receiveShadow
-        castShadow
-      >
-        <meshStandardMaterial color={PALETTE.path} roughness={1} />
-      </RoundedBox>
     </group>
   )
 }

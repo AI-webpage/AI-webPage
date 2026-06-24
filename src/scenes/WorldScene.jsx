@@ -11,29 +11,8 @@ import * as THREE from 'three'
 import { CAMERA, PALETTE, ISLAND } from '../world/constants'
 import Island from '../world/Island'
 import Terrace from '../world/Terrace'
-import GrassPath from '../world/GrassPath'
-import House from '../world/House'
+import BukhakHall from '../world/BukhakHall'
 import Tree from '../world/Tree'
-import Bush from '../world/Bush'
-import Water from '../world/Water'
-import Waterfall from '../world/Waterfall'
-import Bridge from '../world/Bridge'
-import StonePond from '../world/StonePond'
-import LilyPad from '../world/LilyPad'
-import Cattail from '../world/Cattail'
-import Lantern from '../world/Lantern'
-import Fence from '../world/Fence'
-import Sign from '../world/Sign'
-import ClockPost from '../world/ClockPost'
-import Mailbox from '../world/Mailbox'
-import Bench from '../world/Bench'
-import Stump from '../world/Stump'
-import Bucket from '../world/Bucket'
-import TableSet from '../world/TableSet'
-import Apple from '../world/Apple'
-import Daisy from '../world/Daisy'
-import BeachBall from '../world/BeachBall'
-import Duck from '../world/Duck'
 
 /**
  * Scene B — SOFTWARE 월드맵 (아이소메트릭 디오라마).
@@ -104,35 +83,14 @@ export default function WorldScene() {
       {/* 토대 */}
       <Island />
       <Terrace />
-      <GrassPath />
 
       {/* 물 시스템 */}
-      <Water />
-      <Waterfall />
-      <Bridge />
-      <StonePond />
-      <LilyPad />
-      <Cattail />
 
       {/* 랜드마크 + 녹지 */}
-      <House />
+      <BukhakHall />
       <Tree />
-      <Bush />
 
       {/* 소품 + 미세 애니메이션 */}
-      <Daisy />
-      <Apple />
-      <Lantern />
-      <Fence />
-      <Sign />
-      <ClockPost />
-      <Mailbox />
-      <Bench />
-      <Stump />
-      <Bucket />
-      <TableSet />
-      <BeachBall />
-      <Duck />
 
       {/* 바닥 접지 그림자 */}
       <ContactShadows

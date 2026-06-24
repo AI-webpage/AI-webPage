@@ -13,6 +13,11 @@ const HALF = ISLAND.size / 2
 const WHITE = '#F4F0E6'
 const YELLOW = '#F2C14E'
 const STEM = '#6E8B3D'
+const HALL = { halfW: 5.35, front: 0.05, back: -6.6 }
+
+function isNearHall(x, z) {
+  return x > -HALL.halfW && x < HALL.halfW && z > HALL.back && z < HALL.front
+}
 
 function buildDaisies() {
   const rnd = seededRandom(246810)
@@ -21,7 +26,7 @@ function buildDaisies() {
   while (arr.length < 46 && g++ < 800) {
     const x = randRange(rnd, -HALF + 1.5, HALF - 1.5)
     const z = randRange(rnd, -HALF + 1.5, HALF - 1.5)
-    if (Math.hypot(x, z + 4) < 3.2) continue // 집 회피
+    if (isNearHall(x, z)) continue // 북악관 주변 회피
     if (Math.abs(x) < 1.7 && z > 0) continue // 길 회피
     arr.push({
       x,
