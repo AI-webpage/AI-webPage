@@ -39,24 +39,24 @@ export default function Island() {
         <meshStandardMaterial color={PALETTE.grass} roughness={0.9} />
       </RoundedBox>
 
-      {/* 단차 잔디 1 — 뒤쪽 언덕 */}
+      {/* 단차 잔디 1 — 뒤-왼쪽 언덕 (집과 겹치지 않게) */}
       <RoundedBox
-        args={[S * 0.5, 0.7, S * 0.4]}
+        args={[S * 0.3, 0.6, S * 0.26]}
         radius={0.3}
         smoothness={4}
-        position={[-S * 0.14, ISLAND.topY + 0.2, -S * 0.16]}
+        position={[-S * 0.3, ISLAND.topY + 0.15, -S * 0.28]}
         castShadow
         receiveShadow
       >
         <meshStandardMaterial color={PALETTE.grassShade} roughness={0.9} />
       </RoundedBox>
 
-      {/* 단차 잔디 2 — 작은 둔덕 */}
+      {/* 단차 잔디 2 — 앞-오른쪽 작은 둔덕 */}
       <RoundedBox
-        args={[S * 0.28, 0.5, S * 0.28]}
+        args={[S * 0.26, 0.45, S * 0.26]}
         radius={0.25}
         smoothness={4}
-        position={[S * 0.2, ISLAND.topY + 0.15, S * 0.02]}
+        position={[S * 0.28, ISLAND.topY + 0.12, S * 0.18]}
         castShadow
         receiveShadow
       >
