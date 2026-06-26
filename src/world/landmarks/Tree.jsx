@@ -1,15 +1,13 @@
-import { useMemo, useRef } from 'react'
-import { useFrame } from '@react-three/fiber'
+import { useMemo } from 'react'
 import { Instances, Instance } from '@react-three/drei'
 import * as THREE from 'three'
-import { PALETTE, ISLAND } from './constants'
-import { seededRandom, randRange } from '../utils/seededRandom'
+import { PALETTE, ISLAND } from '../config/constants'
+import { seededRandom, randRange } from '../../utils/seededRandom'
 
 const HALF = ISLAND.size / 2
 const EDGE = HALF - 1.15
-const HALL = { halfW: 5.45, front: 0.05, back: -6.6 }
+const HALL = { halfW: 7.35, front: 0.05, back: -6.6 }
 
-// 건물과 계단 앞 시야를 비워두기 위한 제외 영역.
 function isNearHall(x, z) {
   return x > -HALL.halfW && x < HALL.halfW && z > HALL.back && z < HALL.front
 }
@@ -30,7 +28,6 @@ function buildTrees() {
     })
   }
 
-  // 넓어진 땅의 뒤/좌/우 가장자리를 따라 나무를 둘러 배치한다.
   for (let x = -EDGE; x <= EDGE; x += 2.05) {
     push(x + randRange(rnd, -0.35, 0.35), -EDGE + randRange(rnd, -0.35, 0.35), randRange(rnd, 1.25, 1.7))
   }
@@ -49,12 +46,7 @@ function buildTrees() {
 }
 
 export default function Tree() {
-  const trees = useMemo(buildTrees, [])
-  const leafSway = useRef()
-
-  useFrame(({ clock }) => {
-    if (leafSway.current) leafSway.current.rotation.z = Math.sin(clock.elapsedTime * 0.9) * 0.012
-  })
+  const trees = useMemo(() => buildTrees(), [])
 
   const trunkGeo = useMemo(() => new THREE.CylinderGeometry(0.16, 0.22, 1, 7), [])
   const leafGeo = useMemo(() => new THREE.IcosahedronGeometry(1, 1), [])
@@ -97,7 +89,7 @@ export default function Tree() {
         ))}
       </Instances>
 
-      <group ref={leafSway}>
+      <group>
         <Instances geometry={leafGeo} limit={leaves.length} castShadow receiveShadow>
           <meshStandardMaterial roughness={0.85} flatShading />
           {leaves.map((leaf, i) => (

@@ -1,53 +1,21 @@
 import { useMemo } from 'react'
 import { RoundedBox, Text } from '@react-three/drei'
 import * as THREE from 'three'
+import {
+  BUKHAK_ARCH_BAY_X,
+  BUKHAK_BUILDING_SIZE,
+  BUKHAK_COLORS as COLORS,
+  BUKHAK_DORMER_X,
+  BUKHAK_FLOOR_Y,
+  BUKHAK_WINDOW_X,
+} from '../config/bukhakHallDesign'
 
-const BUILDING = {
-  x: 0,
-  y: 0,
-  z: -10,
-  width: 8.6,
-  height: 4.45,
-  depth: 2.6,
-}
-
-const COLORS = {
-  wall: '#D7B888',
-  wallLight: '#F0E5CC',
-  wallShade: '#B98F62',
-  roof: '#BBA985',
-  roofDark: '#8D7655',
-  glass: '#A9CBD2',
-  glassDark: '#6F8D95',
-  door: '#4B362A',
-  stone: '#D8CDB7',
-  stoneShade: '#B8AA94',
-  porticoRoof: '#6F665A',
-  porticoRoofDark: '#51493F',
-  entranceGlow: '#F6D39A',
-  asphalt: '#575A5D',
-  asphaltDark: '#45494C',
-  roadLine: '#F3F1E7',
-  bus: '#41A85F',
-  busDark: '#2F7D46',
-  busLight: '#6CC97E',
-  tire: '#1B1B1B',
-  soil: '#6F5A3D',
-  planterGrass: '#566B38',
-  grassLight: '#6F8345',
-  pine: '#465F2B',
-  pineDark: '#31451F',
-  trunk: '#7A5132',
-}
-
+const BUILDING = BUKHAK_BUILDING_SIZE
 const FRONT_Z = BUILDING.depth / 2
 const PODIUM_HEIGHT = 0.9
-const FLOOR_Y = [0.92, 1.62, 2.34, 3.08]
-const WINDOW_X = [-3.46, -2.82, -2.16, -1.5, 1.5, 2.16, 2.82, 3.46]
-const COLUMN_X = [-3.8, -2.95, -2.1, -1.25, 1.25, 2.1, 2.95, 3.8]
-const DORMER_X = [-3.7, -2.7, -1.7, -0.7, 0.7, 1.7, 2.7, 3.7]
 
-export default function BukhakHall() {
+export default function BukhakHallBuilding({ building }) {
+  const position = building?.position ?? [0, 0, 0]
   const roofGeo = useMemo(() => {
     const shape = new THREE.Shape()
     const halfD = BUILDING.depth / 2 + 0.36
@@ -65,7 +33,7 @@ export default function BukhakHall() {
   }, [])
 
   return (
-    <group position={[BUILDING.x, BUILDING.y, BUILDING.z]}>
+    <group position={position}>
       {/* elevated first floor podium */}
       <RoundedBox
         args={[BUILDING.width + 0.48, PODIUM_HEIGHT, BUILDING.depth + 0.42]}
@@ -98,169 +66,112 @@ export default function BukhakHall() {
         <meshStandardMaterial color={COLORS.roofDark} roughness={0.9} />
       </mesh>
 
-      {DORMER_X.map((x) => (
+      {BUKHAK_DORMER_X.map((x) => (
         <RoofDormer key={x} position={[x, PODIUM_HEIGHT + BUILDING.height + 0.54, FRONT_Z + 0.13]} />
       ))}
 
-      <FacadeRhythm />
+      <SkuFacadePanels />
       <WindowGrid />
+      <FacadeRhythm />
+      <BackWindowGrid />
       <CentralEntrance />
+      <AuxiliaryEntrances />
+      <FrontBanner />
       <BasementStairsLeft />
-      <FrontCampusArea />
-      <Route1164Bus position={[-100, 0.12, 110]} />
       <SideWindows side={-1} />
       <SideWindows side={1} />
     </group>
   )
 }
 
-function FrontCampusArea() {
-  const parkingLines = [
-    [3.1, 7.12, 1.05],
-    [4.35, 7.12, 1.05],
-    [5.6, 7.12, 1.05],
-  ]
-
+function FrontBanner() {
   return (
-    <group>
-      {/* front road and open paved entry area */}
-      <RoundedBox
-        args={[12.35, 0.055, 5.25]}
-        radius={0.08}
-        smoothness={2}
-        position={[0, 0.025, 6.25]}
-        receiveShadow
-      >
-        <meshStandardMaterial color={COLORS.asphalt} roughness={0.96} />
+    <group position={[0, PODIUM_HEIGHT + 2.46, FRONT_Z + 0.48]}>
+      <RoundedBox args={[4.72, 0.42, 0.06]} radius={0.035} smoothness={2} position={[0, 0, 0]} castShadow>
+        <meshStandardMaterial color="#F8F5EC" roughness={0.82} />
       </RoundedBox>
-      <mesh position={[0, 0.092, 6.05]}>
-        <boxGeometry args={[2.9, 0.018, 0.08]} />
-        <meshStandardMaterial color={COLORS.roadLine} roughness={0.7} />
+      <mesh position={[0, 0.18, 0.036]}>
+        <boxGeometry args={[4.42, 0.035, 0.018]} />
+        <meshStandardMaterial color="#2F5D8C" roughness={0.72} />
       </mesh>
-      {[-0.66, -0.22, 0.22, 0.66].map((x) => (
-        <mesh key={x} position={[x, 0.105, 5.18]}>
-          <boxGeometry args={[0.28, 0.02, 1.55]} />
-          <meshStandardMaterial color={COLORS.roadLine} roughness={0.74} />
-        </mesh>
-      ))}
-
-      {/* right side building hint and connected landscaping */}
-      <RoundedBox
-        args={[1.45, 2.8, 1.9]}
-        radius={0.08}
-        smoothness={3}
-        position={[5.08, PODIUM_HEIGHT + 1.42, -0.08]}
-        castShadow
-        receiveShadow
-      >
-        <meshStandardMaterial color={COLORS.wallShade} roughness={0.9} />
-      </RoundedBox>
-      <mesh position={[5.08, PODIUM_HEIGHT + 2.9, -0.08]} castShadow>
-        <boxGeometry args={[1.65, 0.2, 2.08]} />
-        <meshStandardMaterial color={COLORS.roofDark} roughness={0.9} />
+      <mesh position={[0, -0.18, 0.036]}>
+        <boxGeometry args={[4.42, 0.035, 0.018]} />
+        <meshStandardMaterial color="#2F5D8C" roughness={0.72} />
       </mesh>
-
-      {/* parking area */}
-      {parkingLines.map(([x, z, depth]) => (
-        <mesh key={`${x}-${z}`} position={[x, 0.11, z]}>
-          <boxGeometry args={[0.07, 0.02, depth]} />
-          <meshStandardMaterial color={COLORS.roadLine} roughness={0.72} />
-        </mesh>
-      ))}
-      <mesh position={[4.35, 0.11, 6.58]}>
-        <boxGeometry args={[2.45, 0.02, 0.07]} />
-        <meshStandardMaterial color={COLORS.roadLine} roughness={0.72} />
-      </mesh>
+      <Text position={[0, 0, 0.055]} fontSize={0.19} color="#1F2A36" anchorX="center" anchorY="middle" maxWidth={4.3}>
+        대학 기업 협업 SW 아카데미사업
+      </Text>
     </group>
   )
 }
 
-function Route1164Bus({ position }) {
+function SkuFacadePanels() {
+  const panelXs = [-3.05, -1.85, 1.85, 3.05]
+  const stripeYs = [1.15, 2.45, 3.75, 5.05]
+
   return (
-    <group position={position}>
-      <RoundedBox args={[4.8, 1.28, 1.22]} radius={0.12} smoothness={4} position={[0, 0.78, 0]} castShadow receiveShadow>
-        <meshStandardMaterial color={COLORS.bus} roughness={0.82} />
-      </RoundedBox>
-      <RoundedBox args={[1.28, 1.02, 1.18]} radius={0.1} smoothness={3} position={[-1.76, 0.86, 0]} castShadow receiveShadow>
-        <meshStandardMaterial color={COLORS.busLight} roughness={0.82} />
-      </RoundedBox>
-      <mesh position={[0.44, 1.04, -0.63]}>
-        <boxGeometry args={[2.72, 0.38, 0.035]} />
-        <meshStandardMaterial color={COLORS.glass} emissive={COLORS.glassDark} emissiveIntensity={0.08} roughness={0.28} />
-      </mesh>
-      <mesh position={[-1.74, 1.06, -0.63]}>
-        <boxGeometry args={[0.74, 0.42, 0.035]} />
-        <meshStandardMaterial color={COLORS.glass} emissive={COLORS.glassDark} emissiveIntensity={0.08} roughness={0.28} />
-      </mesh>
-      <mesh position={[-2.42, 0.94, 0]} rotation={[0, Math.PI / 2, 0]}>
-        <boxGeometry args={[0.72, 0.46, 0.04]} />
-        <meshStandardMaterial color={COLORS.glassDark} roughness={0.32} />
-      </mesh>
-      <mesh position={[0.28, 0.42, -0.64]}>
-        <boxGeometry args={[3.92, 0.12, 0.045]} />
-        <meshStandardMaterial color={COLORS.busDark} roughness={0.88} />
-      </mesh>
-      <Text
-        position={[0.46, 0.78, -0.675]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        fontSize={0.34}
-        color="#F7F7EF"
-        anchorX="center"
-        anchorY="middle"
-      >
-        1164
-      </Text>
-      <Text
-        position={[-2.48, 0.78, 0]}
-        rotation={[0, -Math.PI / 2, 0]}
-        fontSize={0.28}
-        color="#F7F7EF"
-        anchorX="center"
-        anchorY="middle"
-      >
-        1164
-      </Text>
-      {[-1.48, 1.48].map((x) => (
-        <BusWheel key={x} position={[x, 0.24, -0.62]} radius={0.28} />
-      ))}
-      {[-1.48, 1.48].map((x) => (
-        <BusWheel key={`far-${x}`} position={[x, 0.24, 0.62]} radius={0.25} />
+    <group position={[0, PODIUM_HEIGHT, FRONT_Z + 0.052]}>
+      {panelXs.map((x, index) => (
+        <group key={x} position={[x, 0, 0]}>
+          <RoundedBox args={[0.76, 5.62, 0.045]} radius={0.035} smoothness={2} position={[0, 2.94, 0]} castShadow receiveShadow>
+            <meshStandardMaterial color={index % 2 ? COLORS.skuGold : COLORS.skuOrange} roughness={0.88} />
+          </RoundedBox>
+          {stripeYs.map((y, stripeIndex) => (
+            <mesh key={y} position={[0, y, 0.034]} rotation={[0, 0, -0.48]}>
+              <boxGeometry args={[1.06, 0.08, 0.018]} />
+              <meshStandardMaterial color={stripeIndex % 2 ? COLORS.skuOrange : COLORS.skuGold} roughness={0.82} />
+            </mesh>
+          ))}
+          {[1.7, 3.24, 4.78].map((y) => (
+            <Text key={y} position={[0, y, 0.052]} rotation={[0, 0, -0.5]} fontSize={0.27} color={COLORS.skuDark} anchorX="center" anchorY="middle">
+              SKU
+            </Text>
+          ))}
+        </group>
       ))}
     </group>
-  )
-}
-
-function BusWheel({ position, radius }) {
-  return (
-    <mesh position={position} rotation={[0, 0, Math.PI / 2]} castShadow>
-      <cylinderGeometry args={[radius, radius, 0.14, 12]} />
-      <meshStandardMaterial color={COLORS.tire} roughness={0.9} />
-    </mesh>
   )
 }
 
 function FacadeRhythm() {
+  const beltYs = [1.28, 2.68, 4.08]
+
   return (
     <group position={[0, PODIUM_HEIGHT, FRONT_Z + 0.035]}>
-      <mesh position={[0, 4.0, 0]}>
+      <mesh position={[0, BUILDING.height - 0.42, 0]}>
         <boxGeometry args={[BUILDING.width + 0.05, 0.3, 0.16]} />
         <meshStandardMaterial color={COLORS.wallLight} roughness={0.9} />
       </mesh>
+      <mesh position={[0, 0.18, 0.08]}>
+        <boxGeometry args={[BUILDING.width + 0.16, 0.18, 0.18]} />
+        <meshStandardMaterial color={COLORS.wallShade} roughness={0.92} />
+      </mesh>
+      {beltYs.map((y) => (
+        <mesh key={y} position={[0, y, 0.102]}>
+          <boxGeometry args={[BUILDING.width - 0.34, 0.055, 0.06]} />
+          <meshStandardMaterial color={COLORS.wallCool} roughness={0.9} />
+        </mesh>
+      ))}
 
-      {COLUMN_X.map((x) => (
+      {BUKHAK_ARCH_BAY_X.map((x) => (
         <group key={x}>
           <RoundedBox
-            args={[0.18, 3.8, 0.2]}
+            args={[0.18, BUILDING.height - 0.84, 0.22]}
             radius={0.06}
             smoothness={3}
-            position={[x, 2.16, 0.03]}
+            position={[x, (BUILDING.height - 0.84) / 2 + 0.1, 0.09]}
             castShadow
             receiveShadow
           >
             <meshStandardMaterial color={COLORS.wallLight} roughness={0.88} />
           </RoundedBox>
-          <FacadeArch position={[x, 3.55, 0.095]} scale={[0.52, 0.7, 1]} />
+          <FacadeArch position={[x, 0.5, 0.18]} scale={[1.16, 1.0, 1]} />
         </group>
+      ))}
+      {[-6.05, 6.05].map((x) => (
+        <RoundedBox key={x} args={[0.24, BUILDING.height - 0.48, 0.2]} radius={0.055} smoothness={3} position={[x, BUILDING.height / 2, 0.08]} castShadow receiveShadow>
+          <meshStandardMaterial color={COLORS.wallLight} roughness={0.88} />
+        </RoundedBox>
       ))}
     </group>
   )
@@ -269,11 +180,24 @@ function FacadeRhythm() {
 function WindowGrid() {
   return (
     <group position={[0, PODIUM_HEIGHT, FRONT_Z + 0.08]}>
-      {FLOOR_Y.flatMap((y, row) =>
-        WINDOW_X.map((x) => <Window key={`${row}-${x}`} position={[x, y, 0.03]} />),
+      {BUKHAK_FLOOR_Y.flatMap((y, row) =>
+        BUKHAK_WINDOW_X.map((x) => <Window key={`${row}-${x}`} position={[x, y, 0.03]} />),
       )}
       {[-0.72, 0.72].map((x) =>
-        FLOOR_Y.slice(1).map((y) => <Window key={`center-${x}-${y}`} position={[x, y, 0.03]} />),
+        BUKHAK_FLOOR_Y.slice(1).map((y) => <Window key={`center-${x}-${y}`} position={[x, y, 0.03]} />),
+      )}
+    </group>
+  )
+}
+
+function BackWindowGrid() {
+  return (
+    <group rotation={[0, Math.PI, 0]} position={[0, PODIUM_HEIGHT, -FRONT_Z - 0.08]}>
+      {BUKHAK_FLOOR_Y.flatMap((y, row) =>
+        BUKHAK_WINDOW_X.map((x) => <Window key={`back-${row}-${x}`} position={[-x, y, 0.03]} />),
+      )}
+      {[-0.72, 0.72].map((x) =>
+        BUKHAK_FLOOR_Y.map((y) => <Window key={`back-center-${x}-${y}`} position={[-x, y, 0.03]} />),
       )}
     </group>
   )
@@ -391,119 +315,54 @@ function CentralEntrance() {
         )
       })}
 
-      <StairSidePlanters />
-
-      <pointLight color={COLORS.entranceGlow} intensity={1.8} distance={4.8} decay={2} position={[0, PODIUM_HEIGHT + 1.08, 0.64]} />
     </group>
   )
 }
 
-function StairSidePlanters() {
-  const trees = [
-    { x: -0.48, z: -1.1, scale: 0.58, rotation: 0.25 },
-    { x: 0.5, z: -0.56, scale: 0.66, rotation: 0.8 },
-    { x: -0.24, z: 0.04, scale: 0.62, rotation: 1.3 },
-    { x: 0.44, z: 0.66, scale: 0.7, rotation: 1.9 },
-    { x: -0.42, z: 1.18, scale: 0.6, rotation: 2.35 },
-  ]
-
+function AuxiliaryEntrances() {
   return (
-    <group>
-      {[-1, 1].map((side) => (
-        <group key={side} position={[side * 3.3, 0.09, 1.7]}>
-          <TreePlanter size={[2.05, 0.42, 3.08]} />
-          {trees.map((tree) => (
-            <SmallPine
-              key={`${tree.x}-${tree.z}`}
-              position={[side * tree.x, 0.34, tree.z]}
-              scale={tree.scale}
-              rotation={side * tree.rotation}
-            />
-          ))}
-        </group>
+    <group position={[0, 0, FRONT_Z + 0.2]}>
+      {[-4.95, 4.95].map((x) => (
+        <AuxiliaryEntrance key={x} position={[x, 0, 0]} />
       ))}
     </group>
   )
 }
 
-function TreePlanter({ size }) {
-  const [w, h, d] = size
-  const grassPatches = [
-    [-0.66, -1.22, 0.18],
-    [-0.2, -1.02, -0.12],
-    [0.42, -1.18, 0.28],
-    [-0.5, -0.52, 0.46],
-    [0.06, -0.42, -0.32],
-    [0.7, -0.5, 0.08],
-    [-0.74, 0.08, -0.22],
-    [-0.1, 0.18, 0.34],
-    [0.52, 0.06, -0.46],
-    [-0.46, 0.64, 0.14],
-    [0.18, 0.72, -0.18],
-    [0.72, 0.58, 0.38],
-    [-0.62, 1.16, -0.38],
-    [0.0, 1.2, 0.12],
-    [0.56, 1.08, -0.06],
-  ]
+function AuxiliaryEntrance({ position }) {
+  const steps = [0, 1, 2, 3, 4, 5]
 
   return (
-    <group>
-      <RoundedBox args={[w, 0.08, d]} radius={0.05} smoothness={2} position={[0, 0.03, 0]} receiveShadow>
-        <meshStandardMaterial color={COLORS.soil} roughness={0.98} />
+    <group position={position}>
+      <RoundedBox args={[0.86, 1.28, 0.14]} radius={0.045} smoothness={3} position={[0, PODIUM_HEIGHT + 0.62, 0]} castShadow receiveShadow>
+        <meshStandardMaterial color={COLORS.wallLight} roughness={0.88} />
       </RoundedBox>
-      <mesh position={[0, 0.09, 0]} receiveShadow>
-        <boxGeometry args={[w * 0.82, 0.035, d * 0.86]} />
-        <meshStandardMaterial color={COLORS.planterGrass} roughness={0.95} />
+      <RoundedBox args={[0.58, 1.02, 0.06]} radius={0.035} smoothness={2} position={[0, PODIUM_HEIGHT + 0.52, 0.08]} castShadow>
+        <meshStandardMaterial color={COLORS.door} emissive="#1B120D" emissiveIntensity={0.14} roughness={0.72} />
+      </RoundedBox>
+      <mesh position={[0, PODIUM_HEIGHT + 0.54, 0.12]}>
+        <boxGeometry args={[0.03, 0.82, 0.025]} />
+        <meshStandardMaterial color={COLORS.wallLight} roughness={0.82} />
       </mesh>
-      {grassPatches.map(([x, z, rotation]) => (
-        <GrassTuft key={`${x}-${z}`} position={[x, 0.16, z]} rotation={rotation} />
-      ))}
-      <PlanterWall position={[0, h / 2, -d / 2]} size={[w, h, 0.14]} />
-      <PlanterWall position={[0, h / 2, d / 2]} size={[w, h, 0.14]} />
-      <PlanterWall position={[-w / 2, h / 2, 0]} size={[0.14, h, d]} />
-      <PlanterWall position={[w / 2, h / 2, 0]} size={[0.14, h, d]} />
-    </group>
-  )
-}
-
-function GrassTuft({ position, rotation = 0 }) {
-  return (
-    <group position={position} rotation={[0, rotation, 0]}>
-      {[-0.08, 0, 0.08].map((x, index) => (
-        <mesh key={x} position={[x, 0.07 + index * 0.015, 0]} rotation={[0.16 - index * 0.13, 0, x * 2.2]} castShadow>
-          <coneGeometry args={[0.035, 0.2 + index * 0.025, 4]} />
-          <meshStandardMaterial color={index === 1 ? COLORS.grassLight : COLORS.planterGrass} roughness={0.92} flatShading />
-        </mesh>
-      ))}
-    </group>
-  )
-}
-
-function PlanterWall({ position, size }) {
-  return (
-    <RoundedBox args={size} radius={0.035} smoothness={2} position={position} castShadow receiveShadow>
-      <meshStandardMaterial color={COLORS.stoneShade} roughness={0.96} />
-    </RoundedBox>
-  )
-}
-
-function SmallPine({ position, scale = 1, rotation = 0 }) {
-  return (
-    <group position={position} scale={scale} rotation={[0, rotation, 0]}>
-      <mesh position={[0, 0.48, 0]} castShadow>
-        <cylinderGeometry args={[0.11, 0.15, 0.96, 6]} />
-        <meshStandardMaterial color={COLORS.trunk} roughness={0.96} flatShading />
-      </mesh>
-      {[
-        { y: 0.98, radius: 0.68, color: COLORS.pineDark },
-        { y: 1.28, radius: 0.54, color: COLORS.pine },
-        { y: 1.55, radius: 0.4, color: COLORS.pine },
-      ].map((branch) => (
-        <mesh key={branch.y} position={[0, branch.y, 0]} scale={[1, 0.42, 1]} castShadow receiveShadow>
-          <coneGeometry args={[branch.radius, 0.62, 7]} />
-          <meshStandardMaterial color={branch.color} roughness={0.9} flatShading />
-        </mesh>
-      ))}
+      <RoundedBox args={[0.98, 0.12, 0.18]} radius={0.035} smoothness={2} position={[0, PODIUM_HEIGHT + 1.25, 0.04]} castShadow receiveShadow>
+        <meshStandardMaterial color={COLORS.stone} roughness={0.94} />
+      </RoundedBox>
+      {steps.map((i) => {
+        const t = i / (steps.length - 1)
+        return (
+          <RoundedBox
+            key={i}
+            args={[1.08 - t * 0.12, 0.075, 0.22]}
+            radius={0.025}
+            smoothness={2}
+            position={[0, 0.04 + t * (PODIUM_HEIGHT - 0.08), 1.2 - t * 0.76]}
+            castShadow
+            receiveShadow
+          >
+            <meshStandardMaterial color={i % 2 ? COLORS.stoneShade : COLORS.stone} roughness={0.94} />
+          </RoundedBox>
+        )
+      })}
     </group>
   )
 }
@@ -655,7 +514,7 @@ function SideWindows({ side }) {
   const x = side * (BUILDING.width / 2 + 0.03)
   return (
     <group rotation={[0, side > 0 ? Math.PI / 2 : -Math.PI / 2, 0]} position={[x, PODIUM_HEIGHT, -0.25]}>
-      {[1.08, 1.92, 2.76].map((y) =>
+      {BUKHAK_FLOOR_Y.map((y) =>
         [-0.52, 0.12].map((z) => <Window key={`${side}-${y}-${z}`} position={[z, y, 0.02]} />),
       )}
     </group>
@@ -686,7 +545,7 @@ function Window({ position }) {
 }
 
 function FacadeArch({ position, scale }) {
-  const archGeo = useMemo(() => makeArchGeometry(0.55, 0.88, 0.16, 0.08), [])
+  const archGeo = useMemo(() => makeArchGeometry(0.92, 5.58, 0.13, 0.12), [])
   return (
     <mesh position={position} scale={scale} geometry={archGeo} castShadow>
       <meshStandardMaterial color={COLORS.wallLight} roughness={0.9} flatShading />
@@ -718,8 +577,15 @@ function RoofDormer({ position }) {
 
   return (
     <group position={position}>
+      <RoundedBox args={[0.58, 0.08, 0.32]} radius={0.025} smoothness={2} position={[0, -0.02, 0]} castShadow>
+        <meshStandardMaterial color={COLORS.roofDark} roughness={0.9} />
+      </RoundedBox>
       <mesh geometry={dormerGeo} castShadow>
         <meshStandardMaterial color={COLORS.roof} roughness={0.86} flatShading />
+      </mesh>
+      <mesh position={[0, 0.29, 0]} castShadow>
+        <boxGeometry args={[0.42, 0.055, 0.3]} />
+        <meshStandardMaterial color={COLORS.roofDark} roughness={0.9} />
       </mesh>
       <mesh position={[0, 0.12, 0.13]}>
         <boxGeometry args={[0.18, 0.14, 0.035]} />

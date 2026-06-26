@@ -1,21 +1,13 @@
 import { RoundedBox } from '@react-three/drei'
-import { PALETTE, ISLAND } from './constants'
+import { PALETTE, ISLAND } from '../config/constants'
 
-/**
- * 섬 본체 — 둥근 토이 룩.
- *  - 잔디 윗면(큰 RoundedBox, 윗면 y=0)
- *  - 그 아래 흙 본체(살짝 좁고 깊은 블록)
- *  - 높이가 살짝 다른 잔디 슬래브 2~3장으로 단차(언덕 느낌)
- * 치수는 상단 상수로 빼서 미세조정 가능.
- */
 const S = ISLAND.size
-const GRASS_H = 1.4 // 잔디 슬래브 두께
-const DIRT_H = 4.0 // 흙 본체 깊이
+const GRASS_H = 1.4
+const DIRT_H = 4.0
 
 export default function Island() {
   return (
     <group>
-      {/* 흙 본체 (아래로 깊게) */}
       <RoundedBox
         args={[S * 0.95, DIRT_H, S * 0.95]}
         radius={0.5}
@@ -27,7 +19,6 @@ export default function Island() {
         <meshStandardMaterial color={PALETTE.trunk} roughness={0.98} />
       </RoundedBox>
 
-      {/* 잔디 윗면 (윗면 = topY) */}
       <RoundedBox
         args={[S, GRASS_H, S]}
         radius={0.55}
@@ -38,7 +29,6 @@ export default function Island() {
       >
         <meshStandardMaterial color={PALETTE.grass} roughness={0.9} />
       </RoundedBox>
-
     </group>
   )
 }
