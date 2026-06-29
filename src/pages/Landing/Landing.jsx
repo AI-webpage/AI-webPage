@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import landingVideo from '../../assets/video/landingPage.mp4';
+import landingVideo from '../../assets/video/landingPage.MP4';
 import monitorSvg from '../../assets/images/모니터_빈화면.svg';
 import DesignStage from '../../components/shared/DesignStage';
 import Terminal from './Terminal';

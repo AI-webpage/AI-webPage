@@ -108,7 +108,7 @@ export default function GLBCharacter({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actions, names])
 
-  useFrame(({ clock }, dt) => {
+  useFrame(({ clock }) => {
     const g = group.current
     if (!g) return
     const t = clock.elapsedTime + phase
