@@ -1,0 +1,114 @@
+.bus-modal-overlay {
+  --bus-modal-text: #172033;
+  --bus-modal-muted: #637087;
+  --bus-modal-primary: #2468c9;
+  --bus-modal-radius-lg: 20px;
+  --bus-modal-radius-md: 14px;
+  --bus-modal-card-bg: #f5f9ff;
+  --bus-modal-card-border: #dce8f8;
+  --bus-modal-shadow: 0 24px 80px rgba(0, 0, 0, 0.38);
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.65);
+  touch-action: auto;
+}
+
+.bus-modal {
+  position: relative;
+  width: min(620px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 28px;
+  border-radius: var(--bus-modal-radius-lg);
+  background: #fff;
+  color: var(--bus-modal-text);
+  box-shadow: var(--bus-modal-shadow);
+}
+
+.bus-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #273044;
+  font-size: 34px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.bus-modal-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-right: 38px;
+}
+
+.bus-modal-heading h2 {
+  margin: 0;
+  font-size: clamp(23px, 4vw, 30px);
+  font-weight: 800;
+}
+
+.bus-modal-direction {
+  margin: 4px 0 0;
+  color: var(--bus-modal-muted);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.bus-modal-badge {
+  padding: 7px 11px;
+  border-radius: 10px;
+  background: var(--bus-modal-primary);
+  color: #fff;
+  font-weight: 800;
+}
+
+.bus-modal-intro {
+  margin: 18px 0 20px;
+  color: #465166;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.bus-modal strong { color: #1559b5; }
+
+.bus-tip-grid {
+  display: grid;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.bus-tip-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--bus-modal-card-border);
+  border-radius: var(--bus-modal-radius-md);
+  background: var(--bus-modal-card-bg);
+}
+
+.bus-tip-icon { font-size: 23px; line-height: 1.2; }
+.bus-tip-card h3 { margin: 0 0 5px; font-size: 16px; }
+.bus-tip-card p { margin: 0; color: #536077; font-size: 14px; line-height: 1.55; }
+.bus-modal-note { margin: 18px 0 0; color: #7a8495; font-size: 12px; text-align: center; }
+
+.bus-modal button:focus-visible { outline: 3px solid var(--bus-modal-primary); outline-offset: 3px; }
+
+@media (max-width: 640px) {
+  .bus-modal-overlay { padding: 12px; }
+  .bus-modal { max-height: calc(100dvh - 24px); padding: 24px 16px; border-radius: 16px; }
+  .bus-modal-heading { align-items: flex-start; gap: 9px; }
+  .bus-modal-intro { font-size: 14px; }
+  .bus-tip-grid { margin-top: 20px; }
+  .bus-tip-card { padding: 13px; }
+}

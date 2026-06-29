@@ -1,4 +1,5 @@
-import { RoundedBox, Text } from '@react-three/drei'
+import { useEffect, useState } from 'react'
+import { Html, RoundedBox, Text } from '@react-three/drei'
 
 const COLORS = {
   bus: '#23D64F',
@@ -13,12 +14,73 @@ const COLORS = {
   tire: '#1B1B1B',
 }
 
-export default function Bus({ position, rotation = [0, 0, 0], routeNumber = '1164' }) {
-  const sideWindows = [-0.18, 0.48, 1.14, 1.8]
-  const bodyPanels = [-0.58, 0.18, 0.94, 1.7]
+const SIDE_WINDOWS = [-0.18, 0.48, 1.14, 1.8]
+const BODY_PANELS = [-0.58, 0.18, 0.94, 1.7]
+const SIDE_MARKERS = [-0.88, 0.18, 1.2, 2.18]
+const WHEEL_X_POSITIONS = [-1.58, 1.78]
+
+const TOOLTIP_STYLE = {
+  padding: '8px 13px',
+  borderRadius: '999px',
+  background: 'rgba(255,255,255,.95)',
+  boxShadow: '0 6px 18px rgba(17,64,125,.22)',
+  color: '#172033',
+  fontSize: '13px',
+  fontWeight: 700,
+  whiteSpace: 'nowrap',
+}
+
+export default function Bus({ position, rotation = [0, 0, 0], routeNumber = '1164', onClick }) {
+  const [isHovered, setIsHovered] = useState(false)
+  const isInteractive = Boolean(onClick)
+
+  useEffect(() => {
+    return () => {
+      if (isInteractive) document.body.style.cursor = 'default'
+    }
+  }, [isInteractive])
+
+  const handleClick = (event) => {
+    if (!isInteractive) return
+    event.stopPropagation()
+    onClick()
+  }
+
+  const handlePointerOver = (event) => {
+    if (!isInteractive) return
+    event.stopPropagation()
+    setIsHovered(true)
+    document.body.style.cursor = 'pointer'
+  }
+
+  const handlePointerOut = () => {
+    if (!isInteractive) return
+    setIsHovered(false)
+    document.body.style.cursor = 'default'
+  }
 
   return (
-    <group position={position} rotation={rotation}>
+    <group
+      position={position}
+      rotation={rotation}
+      scale={isHovered ? 1.035 : 1}
+      onClick={handleClick}
+      onPointerOver={handlePointerOver}
+      onPointerOut={handlePointerOut}
+    >
+      {isHovered && (
+        <>
+          <RoundedBox args={[5.65, 1.55, 1.42]} radius={0.2} smoothness={4} position={[0, 0.8, 0]} raycast={() => null}>
+            <meshBasicMaterial color="#6FAEFF" transparent opacity={0.2} wireframe depthWrite={false} />
+          </RoundedBox>
+          <Html position={[0, 2.25, 0]} center zIndexRange={[100, 0]} style={{ pointerEvents: 'none' }}>
+            <div style={TOOLTIP_STYLE}>
+              {routeNumber} 버스 정보 보기
+            </div>
+          </Html>
+        </>
+      )}
+
       <RoundedBox args={[5.45, 1.32, 1.22]} radius={0.18} smoothness={5} position={[0, 0.76, 0]} castShadow receiveShadow>
         <meshStandardMaterial color={COLORS.bus} roughness={0.82} />
       </RoundedBox>
@@ -36,9 +98,9 @@ export default function Bus({ position, rotation = [0, 0, 0], routeNumber = '116
         </mesh>
       ))}
 
-      <BusWindowSide z={0.68} bandZ={0.645} sideWindows={sideWindows} />
+      <BusWindowSide z={0.68} bandZ={0.645} sideWindows={SIDE_WINDOWS} />
       <DriverWindow position={[-2.1, 1.0, 0.68]} />
-      <BusWindowSide z={-0.68} bandZ={-0.645} sideWindows={sideWindows} sideKey="right" />
+      <BusWindowSide z={-0.68} bandZ={-0.645} sideWindows={SIDE_WINDOWS} sideKey="right" />
       <BusSideDoor position={[-2.2, 0, -0.69]} />
 
       <RoundedBox args={[0.08, 0.82, 0.94]} radius={0.08} smoothness={3} position={[-2.76, 1.02, 0]} castShadow>
@@ -49,7 +111,7 @@ export default function Bus({ position, rotation = [0, 0, 0], routeNumber = '116
         <meshStandardMaterial color={COLORS.frontGlass} emissive={COLORS.frontGlassGlow} emissiveIntensity={0.12} roughness={0.22} />
       </mesh>
 
-      {bodyPanels.map((x) => (
+      {BODY_PANELS.map((x) => (
         <mesh key={x} position={[x, 0.48, 0.655]}>
           <boxGeometry args={[0.58, 0.44, 0.028]} />
           <meshStandardMaterial color={COLORS.busPanel} roughness={0.86} />
@@ -85,7 +147,7 @@ export default function Bus({ position, rotation = [0, 0, 0], routeNumber = '116
         {routeNumber}
       </Text>
 
-      {[-0.88, 0.18, 1.2, 2.18].map((x) => (
+      {SIDE_MARKERS.map((x) => (
         <mesh key={x} position={[x, 0.35, 0.69]}>
           <sphereGeometry args={[0.055, 8, 6]} />
           <meshStandardMaterial color="#FFC94A" emissive="#FFC94A" emissiveIntensity={0.22} roughness={0.45} />
@@ -94,10 +156,10 @@ export default function Bus({ position, rotation = [0, 0, 0], routeNumber = '116
 
       <BusRear routeNumber={routeNumber} />
 
-      {[-1.58, 1.78].map((x) => (
+      {WHEEL_X_POSITIONS.map((x) => (
         <BusWheel key={x} position={[x, 0.24, 0.62]} radius={0.31} />
       ))}
-      {[-1.58, 1.78].map((x) => (
+      {WHEEL_X_POSITIONS.map((x) => (
         <BusWheel key={`far-${x}`} position={[x, 0.24, -0.62]} radius={0.27} />
       ))}
     </group>

@@ -1,4 +1,4 @@
-import { Suspense, useEffect } from 'react'
+import { Suspense, useCallback, useEffect, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
 import * as THREE from 'three'
 import LandingScene from './scenes/LandingScene'
@@ -9,6 +9,12 @@ import ForegroundCharacter from './components/ForegroundCharacter'
 import Overlay from './ui/Overlay'
 import { useStore } from './store'
 import landingVideo from './assets/video/landing.mp4'
+import GS25Modal from './components/GS25Modal'
+import BukakModal from './components/BukakModal'
+import RightWingModal from './components/RightWingModal'
+import Bus1164Modal from './components/Bus1164Modal'
+import Bus2115Modal from './components/Bus2115Modal'
+import CampusGuideModal from './components/CampusGuideModal'
 
 /**
  * 루트.
@@ -22,6 +28,15 @@ import landingVideo from './assets/video/landing.mp4'
  */
 export default function App() {
   const phase = useStore((s) => s.phase)
+  const [isGS25ModalOpen, setIsGS25ModalOpen] = useState(false)
+  const [isBukakModalOpen, setIsBukakModalOpen] = useState(false)
+  const [isRightWingModalOpen, setIsRightWingModalOpen] = useState(false)
+  const [isBus1164ModalOpen, setIsBus1164ModalOpen] = useState(false)
+  const [isBus2115ModalOpen, setIsBus2115ModalOpen] = useState(false)
+  const [isCampusGuideModalOpen, setIsCampusGuideModalOpen] = useState(false)
+  const closeGS25Modal = useCallback(() => setIsGS25ModalOpen(false), [])
+  const closeBukakModal = useCallback(() => setIsBukakModalOpen(false), [])
+  const closeRightWingModal = useCallback(() => setIsRightWingModalOpen(false), [])
 
   // 전환 구간 포함해서 어떤 씬을 그릴지 결정
   const showLanding = phase === 'landing' || phase === 'toWorld'
@@ -56,7 +71,15 @@ export default function App() {
 
         <Suspense fallback={null}>
           {showLanding && <LandingScene />}
-          {showWorld && <WorldScene />}
+          {showWorld && (
+            <WorldScene
+              onGS25Click={() => setIsGS25ModalOpen(true)}
+              onBukakClick={() => setIsBukakModalOpen(true)}
+              onRightWingClick={() => setIsRightWingModalOpen(true)}
+              onBus1164Click={() => setIsBus1164ModalOpen(true)}
+              onBus2115Click={() => setIsBus2115ModalOpen(true)}
+            />
+          )}
           <ReadySignal />
         </Suspense>
       </Canvas>
@@ -70,8 +93,22 @@ export default function App() {
       {/* skon.glb — 터미널보다 위 레이어 (겹치면 skon 이 위에) */}
       {showLanding && <ForegroundCharacter />}
 
-      <Overlay />
+      <Overlay onOpenCampusGuide={() => setIsCampusGuideModalOpen(true)} />
       <Loader />
+      {isCampusGuideModalOpen && (
+        <CampusGuideModal onClose={() => setIsCampusGuideModalOpen(false)} />
+      )}
+      {isGS25ModalOpen && <GS25Modal onClose={closeGS25Modal} />}
+      {isBukakModalOpen && <BukakModal onClose={closeBukakModal} />}
+      {isRightWingModalOpen && <RightWingModal onClose={closeRightWingModal} />}
+      <Bus1164Modal
+        isOpen={isBus1164ModalOpen}
+        onClose={() => setIsBus1164ModalOpen(false)}
+      />
+      <Bus2115Modal
+        isOpen={isBus2115ModalOpen}
+        onClose={() => setIsBus2115ModalOpen(false)}
+      />
     </>
   )
 }

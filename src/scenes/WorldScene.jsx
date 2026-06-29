@@ -26,7 +26,7 @@ function WorldBackground() {
   return null
 }
 
-export default function WorldScene() {
+export default function WorldScene({ onGS25Click, onBukakClick, onRightWingClick, onBus1164Click, onBus2115Click }) {
   return (
     <group>
       <WorldBackground />
@@ -71,7 +71,13 @@ export default function WorldScene() {
 
       <Island />
       <Terrace />
-      <BukhakHall />
+      <BukhakHall
+        onGS25Click={onGS25Click}
+        onBukakClick={onBukakClick}
+        onRightWingClick={onRightWingClick}
+        onBus1164Click={onBus1164Click}
+        onBus2115Click={onBus2115Click}
+      />
       <Tree />
 
       <ContactShadows

@@ -1,5 +1,5 @@
-import { useMemo } from 'react'
-import { RoundedBox, Text } from '@react-three/drei'
+import { useEffect, useMemo, useState } from 'react'
+import { Html, RoundedBox, Text } from '@react-three/drei'
 import * as THREE from 'three'
 import {
   BUKHAK_ARCH_BAY_X,
@@ -14,7 +14,8 @@ const BUILDING = BUKHAK_BUILDING_SIZE
 const FRONT_Z = BUILDING.depth / 2
 const PODIUM_HEIGHT = 0.9
 
-export default function BukhakHallBuilding({ building }) {
+export default function BukhakHallBuilding({ building, onClick }) {
+  const [isBukakHovered, setIsBukakHovered] = useState(false)
   const position = building?.position ?? [0, 0, 0]
   const roofGeo = useMemo(() => {
     const shape = new THREE.Shape()
@@ -32,8 +33,69 @@ export default function BukhakHallBuilding({ building }) {
     return geo
   }, [])
 
+  useEffect(() => {
+    return () => {
+      document.body.style.cursor = 'default'
+    }
+  }, [])
+
+  const handleClick = (event) => {
+    event.stopPropagation()
+    onClick?.()
+  }
+
   return (
-    <group position={position}>
+    <group
+      position={position}
+      scale={isBukakHovered ? 1.025 : 1}
+      onClick={handleClick}
+      onPointerOver={(event) => {
+        event.stopPropagation()
+        setIsBukakHovered(true)
+        document.body.style.cursor = 'pointer'
+      }}
+      onPointerOut={() => {
+        setIsBukakHovered(false)
+        document.body.style.cursor = 'default'
+      }}
+    >
+      {isBukakHovered && (
+        <>
+          <RoundedBox
+            args={[BUILDING.width + 0.35, BUILDING.height + 0.35, BUILDING.depth + 0.35]}
+            radius={0.16}
+            smoothness={3}
+            position={[0, PODIUM_HEIGHT + BUILDING.height / 2, 0]}
+            raycast={() => null}
+          >
+            <meshBasicMaterial color="#FFFFFF" transparent opacity={0.16} wireframe depthWrite={false} />
+          </RoundedBox>
+          <Html
+            position={[0, PODIUM_HEIGHT + BUILDING.height + 1.2, 0]}
+            center
+            zIndexRange={[100, 0]}
+            style={{ pointerEvents: 'none' }}
+          >
+            <div
+              style={{
+                padding: '8px 13px',
+                border: '1px solid rgba(255, 255, 255, 0.72)',
+                borderRadius: '999px',
+                background: 'rgba(255, 255, 255, 0.95)',
+                boxShadow: '0 6px 18px rgba(255, 255, 255, 0.2)',
+                color: '#172033',
+                fontSize: '13px',
+                fontWeight: 700,
+                lineHeight: 1,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              북악관 둘러보기
+            </div>
+          </Html>
+        </>
+      )}
+
       {/* elevated first floor podium */}
       <RoundedBox
         args={[BUILDING.width + 0.48, PODIUM_HEIGHT, BUILDING.depth + 0.42]}
@@ -85,21 +147,85 @@ export default function BukhakHallBuilding({ building }) {
 }
 
 function FrontBanner() {
+  const eyeletXs = [-2.22, -1.12, 0, 1.12, 2.22]
+  const leafGeometry = useMemo(() => {
+    const leaf = new THREE.Shape()
+    leaf.moveTo(0, -0.13)
+    leaf.bezierCurveTo(-0.12, -0.035, -0.12, 0.1, 0, 0.16)
+    leaf.bezierCurveTo(0.12, 0.1, 0.12, -0.035, 0, -0.13)
+    return new THREE.ShapeGeometry(leaf, 10)
+  }, [])
+
   return (
     <group position={[0, PODIUM_HEIGHT + 2.46, FRONT_Z + 0.48]}>
-      <RoundedBox args={[4.72, 0.42, 0.06]} radius={0.035} smoothness={2} position={[0, 0, 0]} castShadow>
-        <meshStandardMaterial color="#F8F5EC" roughness={0.82} />
+      {/* thin drop shadow keeps the banner readable against the pale facade */}
+      <RoundedBox args={[4.78, 0.54, 0.025]} radius={0.035} smoothness={3} position={[0.025, -0.025, -0.025]}>
+        <meshBasicMaterial color="#202733" transparent opacity={0.22} />
       </RoundedBox>
-      <mesh position={[0, 0.18, 0.036]}>
-        <boxGeometry args={[4.42, 0.035, 0.018]} />
-        <meshStandardMaterial color="#2F5D8C" roughness={0.72} />
+
+      <RoundedBox args={[4.72, 0.48, 0.06]} radius={0.025} smoothness={3} castShadow>
+        <meshStandardMaterial color="#F7F7F3" roughness={0.9} />
+      </RoundedBox>
+
+      {/* mounting cords and metal eyelets */}
+      {eyeletXs.map((x) => (
+        <group key={x}>
+          <mesh position={[x, 0.292, -0.015]} rotation={[0, 0, x < 0 ? -0.08 : 0.08]}>
+            <boxGeometry args={[0.014, 0.14, 0.014]} />
+            <meshStandardMaterial color="#C8BCA4" roughness={0.95} />
+          </mesh>
+          <mesh position={[x, 0.205, 0.064]}>
+            <ringGeometry args={[0.018, 0.035, 12]} />
+            <meshStandardMaterial color="#A7ADB1" metalness={0.55} roughness={0.42} />
+          </mesh>
+        </group>
+      ))}
+
+      <mesh position={[-2.02, 0, 0.04]}>
+        <boxGeometry args={[0.62, 0.48, 0.018]} />
+        <meshStandardMaterial color="#78A83C" roughness={0.82} />
       </mesh>
-      <mesh position={[0, -0.18, 0.036]}>
-        <boxGeometry args={[4.42, 0.035, 0.018]} />
-        <meshStandardMaterial color="#2F5D8C" roughness={0.72} />
+      <mesh geometry={leafGeometry} position={[-2.02, 0.045, 0.055]} rotation={[0, 0, -0.48]} scale={[0.9, 0.9, 0.9]}>
+        <meshStandardMaterial color="#FFFFFF" roughness={0.7} />
       </mesh>
-      <Text position={[0, 0, 0.055]} fontSize={0.19} color="#1F2A36" anchorX="center" anchorY="middle" maxWidth={4.3}>
-        대학 기업 협업 SW 아카데미사업
+      <mesh position={[-2.02, -0.055, 0.061]} rotation={[0, 0, -0.48]}>
+        <boxGeometry args={[0.012, 0.2, 0.008]} />
+        <meshStandardMaterial color="#78A83C" roughness={0.76} />
+      </mesh>
+      <mesh position={[-2.02, -0.13, 0.055]}>
+        <boxGeometry args={[0.27, 0.022, 0.012]} />
+        <meshStandardMaterial color="#FFFFFF" roughness={0.7} />
+      </mesh>
+
+      <mesh position={[0.25, -0.205, 0.041]}>
+        <boxGeometry args={[3.82, 0.025, 0.018]} />
+        <meshStandardMaterial color="#23517E" roughness={0.72} />
+      </mesh>
+      <mesh position={[2.12, 0, 0.041]} rotation={[0, 0, -0.18]}>
+        <boxGeometry args={[0.12, 0.48, 0.018]} />
+        <meshStandardMaterial color="#D9DEE2" roughness={0.8} />
+      </mesh>
+
+      <Text
+        position={[0.23, 0.06, 0.068]}
+        fontSize={0.205}
+        color="#173D67"
+        anchorX="center"
+        anchorY="middle"
+        maxWidth={3.65}
+        letterSpacing={0.015}
+      >
+        대학-기업협력형 SW아카데미사업
+      </Text>
+      <Text
+        position={[0.23, -0.115, 0.067]}
+        fontSize={0.075}
+        color="#6C7D8B"
+        anchorX="center"
+        anchorY="middle"
+        letterSpacing={0.055}
+      >
+        SOFTWARE ACADEMY
       </Text>
     </group>
   )
