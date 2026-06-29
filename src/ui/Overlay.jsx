@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useStore } from '../store'
 import './overlay.css'
 
-export default function Overlay() {
+export default function Overlay({ onOpenCampusGuide }) {
   const phase = useStore((s) => s.phase)
   const fade = useStore((s) => s.fade)
   const exitToLanding = useStore((s) => s.exitToLanding)
@@ -23,19 +23,19 @@ export default function Overlay() {
       <AnimatePresence>
         {isWorld && (
           <>
-            <motion.a
-              key="campus-map"
+            <motion.button
+              key="campus-guide"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.35 }}
-              className="btn btn-campus-map"
-              href="https://www.skuniv.ac.kr/campus-map"
-              target="_blank"
-              rel="noreferrer"
+              className="btn btn-campus-guide"
+              type="button"
+              onClick={onOpenCampusGuide}
+              aria-label="3D 캠퍼스 투어 안내"
             >
-              캠퍼스맵
-            </motion.a>
+              ?
+            </motion.button>
 
             <motion.button
               key="back"

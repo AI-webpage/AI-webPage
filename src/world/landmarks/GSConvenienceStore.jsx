@@ -1,4 +1,5 @@
-import { RoundedBox, Text } from '@react-three/drei'
+import { useEffect, useState } from 'react'
+import { Html, RoundedBox, Text } from '@react-three/drei'
 
 const COLORS = {
   wall: '#E7D6B6',
@@ -14,9 +15,96 @@ const COLORS = {
   bin: '#465356',
 }
 
-export default function GSConvenienceStore({ position, rotation = [0, 0, 0] }) {
+export default function GSConvenienceStore({ position, rotation = [0, 0, 0], onClick }) {
+  const [isGS25Hovered, setIsGS25Hovered] = useState(false)
+
+  useEffect(() => {
+    return () => {
+      document.body.style.cursor = 'default'
+    }
+  }, [])
+
+  const handleClick = (event) => {
+    event.stopPropagation()
+    onClick?.()
+  }
+
   return (
-    <group position={position} rotation={rotation}>
+    <group
+      position={position}
+      rotation={rotation}
+      scale={isGS25Hovered ? 1.05 : 1}
+      onClick={handleClick}
+      onPointerOver={(event) => {
+        event.stopPropagation()
+        setIsGS25Hovered(true)
+        document.body.style.cursor = 'pointer'
+      }}
+      onPointerOut={() => {
+        setIsGS25Hovered(false)
+        document.body.style.cursor = 'default'
+      }}
+    >
+      {isGS25Hovered && (
+        <>
+          {/* Soft brand-colored outline around the clickable building. */}
+          <RoundedBox
+            args={[2.58, 1.67, 1.01]}
+            radius={0.1}
+            smoothness={3}
+            position={[0, 0.8, 0]}
+            raycast={() => null}
+          >
+            <meshBasicMaterial
+              color="#FFFFFF"
+              transparent
+              opacity={0.2}
+              wireframe
+              depthWrite={false}
+            />
+          </RoundedBox>
+
+          {/* Low-opacity floor ring keeps the highlight grounded in the scene. */}
+          <mesh
+            position={[0, 0.025, 0.45]}
+            rotation={[-Math.PI / 2, 0, 0]}
+            raycast={() => null}
+          >
+            <ringGeometry args={[1.38, 1.72, 48]} />
+            <meshBasicMaterial
+              color="#FFFFFF"
+              transparent
+              opacity={0.24}
+              depthWrite={false}
+            />
+          </mesh>
+
+          <Html
+            position={[0, 2.08, 0]}
+            center
+            zIndexRange={[100, 0]}
+            style={{ pointerEvents: 'none' }}
+          >
+            <div
+              style={{
+                padding: '8px 13px',
+                border: '1px solid rgba(255, 255, 255, 0.72)',
+                borderRadius: '999px',
+                background: 'rgba(255, 255, 255, 0.94)',
+                boxShadow: '0 6px 18px rgba(255, 255, 255, 0.2)',
+                color: '#172033',
+                fontSize: '13px',
+                fontWeight: 700,
+                lineHeight: 1,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              GS25 둘러보기
+            </div>
+          </Html>
+        </>
+      )}
+
       {/* GS convenience store: left side store area */}
       <RoundedBox args={[2.45, 1.54, 0.88]} radius={0.07} smoothness={3} position={[0, 0.78, 0]} castShadow receiveShadow>
         <meshStandardMaterial color={COLORS.wall} roughness={0.9} />

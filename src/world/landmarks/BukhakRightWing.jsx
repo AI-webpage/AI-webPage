@@ -1,5 +1,5 @@
-import { useMemo } from 'react'
-import { RoundedBox } from '@react-three/drei'
+import { useEffect, useMemo, useState } from 'react'
+import { Html, RoundedBox } from '@react-three/drei'
 import * as THREE from 'three'
 
 const COLORS = {
@@ -27,9 +27,73 @@ const WING = {
   roofHeight: 0.72,
 }
 
-export default function BukhakRightWing({ rightWing }) {
+export default function BukhakRightWing({ rightWing, onClick }) {
+  const [isHovered, setIsHovered] = useState(false)
+
+  useEffect(() => {
+    return () => {
+      document.body.style.cursor = 'default'
+    }
+  }, [])
+
+  const handleClick = (event) => {
+    event.stopPropagation()
+    onClick?.()
+  }
+
   return (
-    <group position={rightWing.position} rotation={rightWing.rotation} scale={rightWing.scale}>
+    <group
+      position={rightWing.position}
+      rotation={rightWing.rotation}
+      scale={isHovered ? rightWing.scale.map((value) => value * 1.025) : rightWing.scale}
+      onClick={handleClick}
+      onPointerOver={(event) => {
+        event.stopPropagation()
+        setIsHovered(true)
+        document.body.style.cursor = 'pointer'
+      }}
+      onPointerOut={() => {
+        setIsHovered(false)
+        document.body.style.cursor = 'default'
+      }}
+    >
+      {isHovered && (
+        <>
+          <RoundedBox
+            args={[WING.width + 0.22, WING.height + 0.22, WING.depth + 0.22]}
+            radius={0.14}
+            smoothness={3}
+            position={[0, WING.height / 2, 0]}
+            raycast={() => null}
+          >
+            <meshBasicMaterial color="#FFFFFF" transparent opacity={0.16} wireframe depthWrite={false} />
+          </RoundedBox>
+          <Html
+            position={[0, WING.height + 1, 0]}
+            center
+            zIndexRange={[100, 0]}
+            style={{ pointerEvents: 'none' }}
+          >
+            <div
+              style={{
+                padding: '8px 13px',
+                border: '1px solid rgba(255, 255, 255, 0.72)',
+                borderRadius: '999px',
+                background: 'rgba(255, 255, 255, 0.95)',
+                boxShadow: '0 6px 18px rgba(255, 255, 255, 0.2)',
+                color: '#172033',
+                fontSize: '13px',
+                fontWeight: 700,
+                lineHeight: 1,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              연결 건물 둘러보기
+            </div>
+          </Html>
+        </>
+      )}
+
       <StoneWing />
       <FrontColumns />
       <Eaves />

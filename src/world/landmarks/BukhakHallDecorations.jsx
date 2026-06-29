@@ -15,7 +15,7 @@ const COLORS = {
   trunk: '#7A5132',
 }
 
-export default function BukhakHallDecorations({ island = BUKHAK_HALL_ISLAND }) {
+export default function BukhakHallDecorations({ island = BUKHAK_HALL_ISLAND, onGS25Click, onBus1164Click, onBus2115Click }) {
   const buildingPosition = island.building.position
   const frontZ = island.building.depth / 2
   const planterPosition = island.stairPlanters.position ?? [0, 0, frontZ + 0.22]
@@ -24,13 +24,20 @@ export default function BukhakHallDecorations({ island = BUKHAK_HALL_ISLAND }) {
     <group position={buildingPosition}>
       {/* island object management around Bukhak Hall */}
       <FrontCampusArea />
-      <GSConvenienceStore position={island.convenienceStore.position} rotation={island.convenienceStore.rotation} />
+      <GSConvenienceStore position={island.convenienceStore.position} rotation={island.convenienceStore.rotation} onClick={onGS25Click} />
       {island.buses.map((bus, index) => (
         <Bus
           key={`${bus.routeNumber}-${index}`}
           position={bus.position}
           rotation={bus.rotation}
           routeNumber={bus.routeNumber}
+          onClick={
+            bus.routeNumber === '1164' && index === 1
+              ? onBus1164Click
+              : bus.routeNumber === '2115'
+                ? onBus2115Click
+                : undefined
+          }
         />
       ))}
       <BusStopSign position={island.busStopSign.position} rotation={island.busStopSign.rotation} />
