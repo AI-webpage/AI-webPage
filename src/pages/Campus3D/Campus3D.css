@@ -1,0 +1,139 @@
+/* 3D 캠퍼스 맵 페이지 — 원본(WorldScene/Overlay) 디자인을 그대로 보존.
+   원본은 index.css/overlay.css 의 전역 CSS 변수에 의존했으므로,
+   다른 페이지에 영향을 주지 않도록 폰트 변수를 이 페이지 루트로 스코프한다. */
+.campus3d {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #000;
+  /* 트랙패드 두 손가락 핀치/스크롤을 브라우저가 가로채지 않고
+     OrbitControls(드래그·줌)로 전달되게 한다 (원본 index.css 동작 복원) */
+  touch-action: none;
+
+  /* 원본 index.css :root 의 폰트 변수 (디자인 동일 보장) */
+  --font-ui: 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue',
+    sans-serif;
+  --font-display: 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
+}
+
+.campus3d .campus3d-canvas,
+.campus3d canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+/* ── 월드 브라운 비네트 (캔버스 위) ── */
+.campus3d .vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(42, 30, 14, 0) 42%,
+    rgba(42, 30, 14, 0.55) 80%,
+    rgba(42, 30, 14, 0.9) 100%
+  );
+}
+
+/* ── 오버레이(버튼 레이어) ── */
+.campus3d .overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+  font-family: var(--font-ui);
+  user-select: none;
+}
+.campus3d .overlay button {
+  pointer-events: auto;
+}
+
+/* ── 버튼 ── */
+.campus3d .btn {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: 1px;
+  border: none;
+  cursor: pointer;
+  border-radius: 999px;
+  padding: clamp(12px, 2.4vw, 16px) clamp(26px, 6vw, 44px);
+  font-size: clamp(22px, 3.4vw, 24px);
+  color: #08311c;
+  background: linear-gradient(180deg, #b6ffcf 0%, #57e08a 60%, #2fbf6a 100%);
+  box-shadow: 0 6px 0 #1f8f4d, 0 12px 22px rgba(0, 0, 0, 0.3);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.campus3d .btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 #1f8f4d, 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.campus3d .btn-back {
+  position: absolute;
+  top: clamp(32px, 5vw, 46px);
+  right: clamp(42px, 6vw, 56px);
+  padding: clamp(16px, 3.4vw, 22px) clamp(28px, 6vw, 40px);
+  font-size: clamp(22px, 4vw, 26px);
+  color: #fff;
+  background: linear-gradient(180deg, #5aa9ff 0%, #2f7fe0 100%);
+  box-shadow: 0 5px 0 #1f5db0, 0 10px 18px rgba(0, 0, 0, 0.3);
+}
+
+.campus3d .btn-campus-guide {
+  position: absolute;
+  top: clamp(32px, 5vw, 46px);
+  left: clamp(42px, 6vw, 56px);
+  width: clamp(64px, 12vw, 80px);
+  height: clamp(64px, 12vw, 80px);
+  padding: 0;
+  font-size: clamp(34px, 6vw, 42px);
+  color: #18331f;
+  background: linear-gradient(180deg, #fff4c2 0%, #ffd36c 100%);
+  box-shadow: 0 5px 0 #c08a26, 0 10px 18px rgba(0, 0, 0, 0.3);
+}
+.campus3d .btn-campus-guide:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 4px;
+}
+
+/* ── 로딩 ── */
+.campus3d .loader {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: #000;
+  z-index: 40;
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 22px; /* 로딩 텍스트 최소 크기 */
+}
+.campus3d .loader .spinner {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 5px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #2fbf6a;
+  animation: campus3d-spin 0.9s linear infinite;
+}
+.campus3d .loader .pct {
+  font-weight: 800;
+  font-size: 24px;
+  letter-spacing: 1px;
+}
+@keyframes campus3d-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
