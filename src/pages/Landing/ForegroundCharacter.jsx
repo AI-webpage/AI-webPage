@@ -7,8 +7,8 @@ import ErrorBoundary from './character/ErrorBoundary';
 import { SKON } from './data/characters';
 import { SKON_ANCHOR } from './config';
 
-// 모듈 로드 즉시 skon.glb 다운로드 시작(병렬) → 스프라이트 폴백 노출 시간 최소화
-useGLTF.preload(SKON.glb);
+// 모듈 로드 즉시 skon.glb 다운로드 시작(병렬, Draco) → 스프라이트 폴백 노출 시간 최소화
+useGLTF.preload(SKON.glb, true);
 
 /**
  * skon(GLB 3D 캐릭터)을 모니터 위에 "DOM 앵커링" 하는 풀스크린 투명 캔버스.

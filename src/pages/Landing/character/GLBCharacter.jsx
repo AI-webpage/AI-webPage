@@ -31,7 +31,7 @@ export default function GLBCharacter({
   const group = useRef()
   const inner = useRef()
   const waveUntil = useRef(-1)
-  const { scene, animations } = useGLTF(url)
+  const { scene, animations } = useGLTF(url, true) // true = Draco 디코더(압축 glb)
   const { actions, names, mixer } = useAnimations(animations, group)
 
   const fit = useMemo(() => {
