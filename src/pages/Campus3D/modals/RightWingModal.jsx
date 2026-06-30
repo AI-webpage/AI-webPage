@@ -15,7 +15,7 @@ export default function RightWingModal({ onClose }) {
   return (
     <div className="gs25-modal-overlay" onClick={onClose} role="presentation">
       <section
-        className="gs25-modal"
+        className="gs25-modal right-wing-modal"
         role="dialog"
         aria-modal="true"
         aria-labelledby="right-wing-modal-title"

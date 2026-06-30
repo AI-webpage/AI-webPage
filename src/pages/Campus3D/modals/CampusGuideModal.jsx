@@ -47,6 +47,11 @@ export default function CampusGuideModal({ onClose }) {
             <br />
             각 장소의 자세한 정보를 확인할 수 있어요!
           </p>
+          <p>
+            <strong>드래그로 줌인/줌아웃</strong>해서
+            <br />
+            건물 둘러보기도 가능해요!
+          </p>
         </div>
       </section>
     </div>

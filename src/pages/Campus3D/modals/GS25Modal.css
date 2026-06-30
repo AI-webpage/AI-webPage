@@ -22,6 +22,13 @@
   font-size: 2.44vmin; /* 글자 최소 크기 — 하위 요소가 이 값을 상속 */
 }
 
+/* 건물 모달(북악관·우측동)은 버스 모달(56.94vw)보다 작게 → "건물 < 버스" 규칙 유지.
+   어떤 줌/뷰포트에서도 vw 비율로 고정. */
+.bukak-modal,
+.right-wing-modal {
+  width: min(50vw, 100%);
+}
+
 .gs25-modal-close {
   position: absolute;
   top: 1.33vmin;
@@ -150,7 +157,11 @@
 
 @media (max-width: 640px) {
   .gs25-modal-overlay { padding: 12px; }
-  .gs25-modal {
+  .gs25-modal,
+  .bukak-modal,
+  .right-wing-modal {
+    /* 모바일: 너무 좁아지지 않게 화면 폭 거의 채움 */
+    width: min(92vw, 100%);
     max-height: calc(100dvh - 2.67vmin);
     padding: 5.11vmin 1.78vmin 2.44vmin;
     border-radius: 16px;

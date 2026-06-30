@@ -849,20 +849,21 @@ const Overlay = styled.div.attrs({ className: 'curriculum-panel-scope' })`
 
   .cur-close {
     /* 모달(Stage) 오른쪽 위 모서리 바로 "위"에 놓는다.
-       Stage = min(1300px,96vw) × min(92vh,1000px) 가운데 정렬 → 모서리 좌표를 calc 로 계산 */
+       Stage = 65.3vw × 86vh 가운데 정렬 → 모서리 좌표를 순수 vw/vh 로 계산
+       (px 캡 제거: 줌/뷰포트가 바뀌어도 버튼이 항상 모서리에 붙어 보이게) */
     position: fixed;
-    top: calc(50% - min(46vh, 500px) - 56px); /* Stage 상단보다 56px 위 */
-    right: calc(50% - min(620px, 46vw)); /* Stage 오른쪽 끝 근처 */
+    top: calc(50% - 43vh - 4.5vh); /* Stage(86vh) 상단보다 위 */
+    right: calc(50% - 32.65vw); /* Stage(65.3vw) 오른쪽 끝 */
     z-index: 130;
-    width: 52px;
-    height: 52px;
+    width: clamp(40px, 4.5vmin, 56px);
+    height: clamp(40px, 4.5vmin, 56px);
     border-radius: 50%;
     border: 1px solid rgba(255, 255, 255, 0.85);
     background: rgba(20, 22, 35, 0.45); /* 영상 위에서도 ✕ 보이게 */
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
     color: #fff;
-    font-size: 20px;
+    font-size: clamp(16px, 2.2vmin, 22px);
     cursor: pointer;
     display: grid;
     place-items: center;
@@ -873,6 +874,11 @@ const Overlay = styled.div.attrs({ className: 'curriculum-panel-scope' })`
     &:focus-visible {
       outline: 2px solid #fff;
       outline-offset: 2px;
+    }
+    /* 모바일: Stage 92vw → 오른쪽 끝(=화면 가장자리 근처)에 맞춤 */
+    @media (max-width: 768px) {
+      top: calc(50% - 43vh - 3vh);
+      right: calc(50% - 45vw);
     }
   }
 `;
@@ -905,12 +911,20 @@ const Dots = styled.div`
 /* 모달 안쪽 — 세로 페이저의 뷰포트(고정 크기, 가운데) */
 const Stage = styled.div`
   position: relative;
-  width: min(1300px, 96vw);
-  height: min(92vh, 1000px);
+  /* px 캡 없이 순수 뷰포트 비율 → 어떤 줌/창 크기에서도 화면 점유 비율 동일
+     (50% 줌 중측값 기준 화면 폭 65.3%). 이전 min(1300px,96vw) 는 줌 단계마다
+     96vw↔1300px 로 튀어 "줌 시 비율 깨짐"의 원인이었음. */
+  width: 65.3vw;
+  height: 86vh;
   overflow: hidden;
   border-radius: 22px;
   touch-action: pan-y; /* 세로 제스처 허용 */
   user-select: none; /* 드래그 시 텍스트 선택 방지 (드래그가 페이지 전환을 가로채도록) */
+
+  /* 모바일: 너무 좁아지지 않게 화면 폭 거의 채움 */
+  @media (max-width: 768px) {
+    width: 92vw;
+  }
 `;
 
 /* 2페이지를 위아래로 쌓은 트랙 (translateY 로 전환) */

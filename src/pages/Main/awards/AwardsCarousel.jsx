@@ -122,18 +122,24 @@ const D = 1200; // 곡선 반경(피벗까지 거리)
 const STEP = (CARD_W / (D - HALF)) * (180 / Math.PI) + GAP_DEG; // 카드 간 각도
 const HIDE_DEG = HIDE_FACTOR * STEP; // 중심 ±2장(5장)만 보임
 
-/* 반응형: 설계 기준 뷰포트(BASE) 대비 화면에 맞춰 통째로 축소/확대 */
+/* 반응형: 설계 기준 뷰포트(BASE) 대비 화면에 맞춰 통째로 축소/확대.
+   ── "네이티브 50% 룩" ──
+   데스크탑은 브라우저 줌 50%에서 보이던 크기를 기본값으로 고정한다(줌인/줌아웃해도 동일 비율).
+   이전 SCALE_MAX=1.05 클램프가 줌대역마다 크기를 다르게 만들어(50%에서 작게/100%에서 크게)
+   유일하게 줌 무관이 깨지던 지점이었음 → 상한을 올리고 50% 환산 배율(DESKTOP_50_FACTOR)을 곱해
+   어느 줌에서도 같은 화면 점유 비율(≈50% 줌 모습)이 되게 한다.
+   모바일(≤768px)은 모바일 비율 유지(축소하지 않음). */
 const BASE_W = 2400;
 const BASE_H = 1150;
 const SCALE_MIN = 0.3;
-const SCALE_MAX = 1.05;
+const SCALE_MAX = 2.4; // 25~100% 줌대역에서 클램프가 비율을 깨지 않도록 상한을 올림
+const DESKTOP_50_FACTOR = 0.66; // 브라우저 줌 50%에서 보이던 축소 비율(데스크탑 기본·줌 무관 고정). 크기 조정은 이 값만 바꾸면 됨
+const MOBILE_BP = 768;
 function computeScale() {
   if (typeof window === "undefined") return 1;
-  return clamp(
-    Math.min(window.innerWidth / BASE_W, window.innerHeight / BASE_H),
-    SCALE_MIN,
-    SCALE_MAX,
-  );
+  const fit = Math.min(window.innerWidth / BASE_W, window.innerHeight / BASE_H);
+  const factor = window.innerWidth <= MOBILE_BP ? 1 : DESKTOP_50_FACTOR; // 모바일은 모바일 비율 유지
+  return clamp(fit * factor, SCALE_MIN, SCALE_MAX);
 }
 
 const splitLines = (t) =>

@@ -83,12 +83,26 @@ export default function Main() {
   const armedRef = useRef({ curriculum: true });
   const anyOpenRef = useRef(false);
   const lockedTopRef = useRef(null);
+  const lockedFracRef = useRef(null); // 모달 잠금 위치를 "비율(0~1)"로 보관 → 줌으로 scrollHeight 가 변해도 같은 프레임 유지
   const skipBrakeRef = useRef(false);
   const navRef = useRef({ active: false, at: 0, arrive: null });
   const navTimerRef = useRef(0);
 
   const handleProgress = useCallback((p) => {
-    // SUPPORT & AWARDS 캐러셀 — 진행도에 비례해 아래에서 위로 등장(스크롤 직결, 항상 갱신)
+    // ── 모달(브레이크)이 열린 동안엔 진행도 변화를 전부 동결 ──
+    // 줌인/줌아웃으로 scrollHeight 가 바뀌어 진행도가 흔들려도:
+    //  · 뒤 배경 프레임이 튀거나(배경 깨짐) · awards 카루셀이 같이 떠오르거나
+    //  · 다른 모달이 열리는 일이 없게 한다. 스크롤은 잠금 "비율"로 다시 고정(줌에도 같은 위치).
+    if (anyOpenRef.current) {
+      const scroller = scrollRef.current;
+      if (scroller && lockedFracRef.current != null) {
+        const max = scroller.scrollHeight - scroller.clientHeight;
+        scroller.scrollTop = lockedFracRef.current * max;
+      }
+      return;
+    }
+
+    // SUPPORT & AWARDS 캐러셀 — 진행도에 비례해 아래에서 위로 등장(스크롤 직결)
     const rev = Math.max(
       0,
       Math.min(1, (p - AWARDS_START) / (AWARDS_FULL - AWARDS_START)),
@@ -111,13 +125,6 @@ export default function Main() {
     }
     if (skipBrakeRef.current) {
       skipBrakeRef.current = false;
-      prevPRef.current = p;
-      return;
-    }
-    if (anyOpenRef.current) {
-      const scroller = scrollRef.current;
-      if (scroller && lockedTopRef.current != null)
-        scroller.scrollTop = lockedTopRef.current;
       prevPRef.current = p;
       return;
     }
@@ -150,6 +157,7 @@ export default function Main() {
         const top = hit.at * max;
         scroller.scrollTop = top;
         lockedTopRef.current = top;
+        lockedFracRef.current = hit.at;
       }
       prevPRef.current = hit.at;
       setCurriculumOpen(true);
@@ -164,6 +172,7 @@ export default function Main() {
     armedRef.current.curriculum = false;
     anyOpenRef.current = false;
     lockedTopRef.current = null;
+    lockedFracRef.current = null;
   }, []);
 
   // 헤더 메뉴 클릭 → 해당 진행도(at) 위치로 부드럽게 이동 (선형: top = at*max).
@@ -186,11 +195,13 @@ export default function Main() {
       if (i === 2) {
         armedRef.current.curriculum = false;
         lockedTopRef.current = top;
+        lockedFracRef.current = at;
         anyOpenRef.current = true;
         setCurriculumOpen(true);
       } else {
         anyOpenRef.current = false;
         lockedTopRef.current = null;
+        lockedFracRef.current = null;
         setCurriculumOpen(false);
       }
     };
@@ -227,6 +238,7 @@ export default function Main() {
       <ScrollVideoBackground
         scrollRef={scrollRef}
         onProgress={handleProgress}
+        frozen={curriculumOpen}
       />
 
       {/* HOME 타이핑 인트로 */}

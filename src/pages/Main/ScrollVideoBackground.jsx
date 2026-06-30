@@ -28,7 +28,7 @@ const MAX_DPR = 2; // 레티나 과부하 방지용 상한
 const BACKDROP = '#ffffff'; // 누끼 뒤 깔 배경(흰색). 소켓이 어두워 밝은 배경 필요.
 /* ──────────────────────────────── */
 
-export default function ScrollVideoBackground({ scrollRef, onProgress, mapProgress }) {
+export default function ScrollVideoBackground({ scrollRef, onProgress, mapProgress, frozen = false }) {
   const canvasRef = useRef(null);
   const imagesRef = useRef([]); // 프레임 이미지 배열
   const indexRef = useRef(0); // 현재 그려진 프레임 인덱스 (리사이즈 시 재사용)
@@ -122,6 +122,9 @@ export default function ScrollVideoBackground({ scrollRef, onProgress, mapProgre
     };
 
     const onScroll = () => {
+      // 모달 열림(브레이크) 중엔 진행도/프레임을 동결 — 줌으로 scrollHeight 가 바뀌며
+      // 튀어 들어오는 scroll 이벤트가 배경 프레임을 흔들지 않게 한다.
+      if (frozen) return;
       if (rafRef.current) return; // 이미 예약돼 있으면 skip (throttle)
       rafRef.current = requestAnimationFrame(() => {
         rafRef.current = 0;
@@ -146,7 +149,7 @@ export default function ScrollVideoBackground({ scrollRef, onProgress, mapProgre
         rafRef.current = 0;
       }
     };
-  }, [ready, scrollRef]);
+  }, [ready, scrollRef, frozen]); // frozen 토글 시 리스너 재구독(모달 닫히면 현재 프레임 재동기화)
 
   // 3) 리사이즈 → 현재 프레임 다시 그리기 (rAF throttle, cleanup)
   useEffect(() => {
