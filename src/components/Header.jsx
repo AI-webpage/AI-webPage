@@ -136,7 +136,7 @@ const Bar = styled.header`
   display: flex;
   align-items: center;
   justify-content: center; /* 메뉴를 가운데로 */
-  padding: 0 clamp(16px, 4vw, 48px);
+  padding: 0 clamp(8px, 2.5vw, 40px);
   background: transparent; /* 네모 박스(흰 배경+경계선) 제거 */
   pointer-events: none; /* 빈 영역은 아래 스크롤로 통과, 버튼만 클릭 */
 `;
@@ -145,8 +145,9 @@ const Nav = styled.nav`
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
-  gap: clamp(14px, 2.5vw, 40px);
+  flex-wrap: nowrap; /* 항상 한 줄 — 줌/창 축소에도 줄바꿈 금지 */
+  gap: clamp(6px, 1.4vw, 36px);
+  max-width: 100%;
 `;
 
 const Item = styled.button`
@@ -154,9 +155,11 @@ const Item = styled.button`
   appearance: none;
   cursor: pointer;
   font-family: 'Poppins', system-ui, sans-serif;
-  font-size: clamp(26px, 3.1vw, 40px); /* 폰트 더 키움 (+2px) */
+  /* 전부 vw 기반 → 줌/창 크기와 무관하게 비율 유지, 좁아지면 같이 줄어 한 줄 유지.
+     min 을 낮춰 확대(=좁은 뷰포트)에서도 안 넘치게. */
+  font-size: clamp(11px, 1.9vw, 38px);
   text-transform: uppercase;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.1em;
   white-space: nowrap;
   font-weight: 600;
 
@@ -165,7 +168,7 @@ const Item = styled.button`
   background: transparent;
   border: 2px solid transparent;
   border-radius: 999px;
-  padding: 18px clamp(30px, 2.4vw, 46px); /* 박스 안 여백 더 넓게 (+2px) */
+  padding: clamp(7px, 0.9vw, 16px) clamp(9px, 1.5vw, 40px); /* vw 기반 여백(좁아지면 같이 축소) */
   transition: color 0.25s ease, background 0.25s ease, border-color 0.25s ease;
 
   /* 해당 페이지(프레임)에 오면: 검정 테두리 라운드 박스 + 흰색 반투명 배경 + 흰 글씨 */
