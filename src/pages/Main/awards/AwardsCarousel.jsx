@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import imgImpact from "../../../assets/images/아시아 임팩트 해커톤.svg";
 import imgUMC from "../../../assets/images/UMC 데모데이.svg";
@@ -117,12 +117,24 @@ const wrapOffset = (d) => {
 
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
-function computeD() {
-  if (typeof window === "undefined") return 1200;
-  return clamp(window.innerWidth / 1.3, 1000, 1500);
-}
+/* 고정 설계 지오메트리(px) — 반응형은 전체 scale 로 처리(랜딩 DesignStage 방식). */
+const D = 1200; // 곡선 반경(피벗까지 거리)
+const STEP = (CARD_W / (D - HALF)) * (180 / Math.PI) + GAP_DEG; // 카드 간 각도
+const HIDE_DEG = HIDE_FACTOR * STEP; // 중심 ±2장(5장)만 보임
 
-const stepFor = (D) => (CARD_W / (D - HALF)) * (180 / Math.PI) + GAP_DEG;
+/* 반응형: 설계 기준 뷰포트(BASE) 대비 화면에 맞춰 통째로 축소/확대 */
+const BASE_W = 2400;
+const BASE_H = 1150;
+const SCALE_MIN = 0.3;
+const SCALE_MAX = 1.05;
+function computeScale() {
+  if (typeof window === "undefined") return 1;
+  return clamp(
+    Math.min(window.innerWidth / BASE_W, window.innerHeight / BASE_H),
+    SCALE_MIN,
+    SCALE_MAX,
+  );
+}
 
 const splitLines = (t) =>
   t.split("\n").map((line, i, arr) => (
@@ -135,7 +147,7 @@ const splitLines = (t) =>
 export default function AwardsCarousel({ reveal = 0 }) {
   const [center, setCenter] = useState(6);
   const [active, setActive] = useState(-1); // 처음엔 아무 카드도 활성화 안 함(클릭해야 솟음)
-  const [D, setD] = useState(computeD);
+  const [scale, setScale] = useState(computeScale); // 반응형 전체 스케일
   const [dragging, setDragging] = useState(false);
   const [dismissed, setDismissed] = useState(false); // 배경/X 클릭 시 아래로 슬라이드되어 사라짐
 
@@ -148,15 +160,13 @@ export default function AwardsCarousel({ reveal = 0 }) {
     onCard: false,
   });
 
-  const STEP = useMemo(() => stepFor(D), [D]);
-
   useEffect(() => {
     let raf = 0;
     const onResize = () => {
       if (raf) return;
       raf = requestAnimationFrame(() => {
         raf = 0;
-        setD(computeD());
+        setScale(computeScale());
       });
     };
     window.addEventListener("resize", onResize);
@@ -249,7 +259,6 @@ export default function AwardsCarousel({ reveal = 0 }) {
 
   const hiddenDown = dismissed && reveal > 0.05; // 닫혀서 아래로 내려간 상태
   const interactive = reveal > 0.98 && !dismissed;
-  const hideDeg = HIDE_FACTOR * STEP;
 
   return (
     <Root
@@ -278,12 +287,13 @@ export default function AwardsCarousel({ reveal = 0 }) {
         onPointerDown={interactive ? onPointerDown : undefined}
         style={{ pointerEvents: interactive ? "auto" : "none" }}
       >
-        {CARDS.map((card, i) => {
+        <Fan style={{ transform: `scale(${scale})` }}>
+          {CARDS.map((card, i) => {
           const off = wrapOffset(i - center);
           const deg = off * STEP;
           const isActive = active === i;
-          const hidden = Math.abs(deg) > hideDeg;
-          const scale = isActive ? ACT_SCALE : 1;
+          const hidden = Math.abs(deg) > HIDE_DEG;
+          const cardScale = isActive ? ACT_SCALE : 1;
           const z = isActive ? 1000 : Math.round(200 - Math.abs(deg));
           const clickable = Math.abs(off) <= CLICK_RANGE && !hidden;
 
@@ -296,7 +306,7 @@ export default function AwardsCarousel({ reveal = 0 }) {
               onClick={() => clickCard(i)}
               style={{
                 transformOrigin: `50% ${HALF + D}px`,
-                transform: `rotate(${deg}deg) scale(${scale})`,
+                transform: `rotate(${deg}deg) scale(${cardScale})`,
                 transition: dragging
                   ? "none"
                   : "transform .55s cubic-bezier(.22,.61,.36,1), opacity .55s cubic-bezier(.22,.61,.36,1)",
@@ -332,7 +342,8 @@ export default function AwardsCarousel({ reveal = 0 }) {
               </span>
             </Card>
           );
-        })}
+          })}
+        </Fan>
       </Stage>
 
       <Arrows style={{ pointerEvents: interactive ? "auto" : "none" }}>
@@ -374,6 +385,15 @@ const Stage = styled.div`
   inset: 0;
   touch-action: pan-y; /* 세로 스크롤은 페이지로, 가로 제스처만 캐러셀 */
   outline: none;
+`;
+
+/* 반응형 스케일 래퍼 — 고정 px 지오메트리를 화면에 맞춰 통째로 축소/확대.
+   카드 앵커(50% 62%) 기준으로 스케일해 중심 카드 위치가 유지된다. */
+const Fan = styled.div`
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 62%;
+  will-change: transform;
 `;
 
 const Card = styled.button`
