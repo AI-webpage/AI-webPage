@@ -18,8 +18,8 @@ import { Crt, CrtScreen, CrtLine, Cursor, Scanlines, CrtInput } from './styles';
 const isInput = (i) => i < 1;
 const isFinal = (i) => i === 2;
 
-// 터미널 글자 크기 = 터미널 높이(스테이지 px)의 12%
-const FONT_PX = Math.round((TERM_FRAC.bottom - TERM_FRAC.top) * LANDING.MONITOR_H * 0.12);
+// 터미널 글자 크기 = 터미널 높이(스테이지 px)의 10.5% (살짝 축소)
+const FONT_PX = Math.round((TERM_FRAC.bottom - TERM_FRAC.top) * LANDING.MONITOR_H * 0.105);
 
 export default function Terminal({ active = true, onEnter }) {
   const [history, setHistory] = useState([]);
@@ -38,9 +38,9 @@ export default function Terminal({ active = true, onEnter }) {
       case 0:
         return '이름을 입력하세요: ';
       case 1:
-        return `안녕하세요, ${name || '익명'}님!`;
+        return `${name || '익명'}님, 서경대학교 소프트웨어에 입학하신 걸 축하드립니다!`;
       case 2:
-        return '> 모니터 속으로 입장하려면 [Enter]';
+        return '> [Enter] 로 입장';
       default:
         return '';
     }
