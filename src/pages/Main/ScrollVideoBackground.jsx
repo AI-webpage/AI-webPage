@@ -159,8 +159,10 @@ export default function ScrollVideoBackground({ scrollRef, onProgress, mapProgre
       });
     };
     window.addEventListener('resize', onResize);
+    window.visualViewport?.addEventListener('resize', onResize);
     return () => {
       window.removeEventListener('resize', onResize);
+      window.visualViewport?.removeEventListener('resize', onResize);
       if (raf) cancelAnimationFrame(raf);
     };
   }, []);

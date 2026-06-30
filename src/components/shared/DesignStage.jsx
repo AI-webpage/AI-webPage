@@ -49,9 +49,14 @@ export default function DesignStage({ children, className }) {
     onResize();
     window.addEventListener('resize', onResize);
     window.addEventListener('orientationchange', onResize);
+    // 핀치/브라우저 줌은 resize 를 안 쏠 수 있어 visualViewport 로도 재계산
+    window.visualViewport?.addEventListener('resize', onResize);
+    window.visualViewport?.addEventListener('scroll', onResize);
     return () => {
       window.removeEventListener('resize', onResize);
       window.removeEventListener('orientationchange', onResize);
+      window.visualViewport?.removeEventListener('resize', onResize);
+      window.visualViewport?.removeEventListener('scroll', onResize);
     };
   }, []);
 
