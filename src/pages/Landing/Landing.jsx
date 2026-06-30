@@ -48,7 +48,7 @@ export default function Landing() {
   return (
     <S.LandingRoot>
       {/* 배경 영상 — 스테이지 밖 전체 화면 cover */}
-      <S.LandingVideo src={landingVideo} autoPlay loop muted playsInline />
+      <S.LandingVideo src={landingVideo} autoPlay loop muted playsInline preload="auto" />
 
       <DesignStage>
         <S.DiveLayer
